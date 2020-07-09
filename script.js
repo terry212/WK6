@@ -41,8 +41,26 @@ $(document).ready(function () {
         $("#weather-info").append(windSpeed, humidity, temp);
         $("#weather-icons").append(img);
 
+        indexUV(weather.coord.lat, weather.coord.lon);
       }
     })
   }
 
+  function indexUV(latitude, longitude) {
+    $.ajax({
+      type: "GET",
+      url: `http://api.openweathermap.org/data/2.5/uvi?appid=${key}&lat=${latitude}&lon=${longitude}`,
+      dataType: "JSON",
+      success: function (UVData) {
+        var pTag = $("<p>").text("UV Index: ");
+        var btn = $("<span>").addClass("btn btn-sm").text(UVData.value);
+        // change button color via bootsrap class
+        if (UVData.value <= 3) { btn.addClass("btn-success"); }
+        else if (UVData.value <= 7) { btn.addClass("btn-warning"); }
+        else { btn.addClass("btn-danger"); }
+        // append UV data
+        $("#weather-info").append(pTag.append(btn));
+      }
+    });
+  }
 });
