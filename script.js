@@ -3,9 +3,9 @@ $(document).ready(function () {
   var history = JSON.parse(window.localStorage.getItem("history")) || [];
   // Show weather of last item in storage
   if (history.length > 0) {
-    findWeather(history[history.length-1]);
+    findWeather(history[history.length - 1]);
   }
-  // append items in the history bar
+  // Append items in the history bar
   for (var i = 0; i < history.length; i++) {
     makeHistory(history[i]);
   }
@@ -14,7 +14,6 @@ $(document).ready(function () {
     var search = $("#search-query").val();
     // clear search box
     $("#search-query").val("");
-
     findWeather(search);
   });
 
@@ -50,16 +49,14 @@ $(document).ready(function () {
         var windSpeed = $("<p>").addClass("list").text(`Wind Speed: ${weather.wind.speed} MPH`);
         var humidity = $("<p>").addClass("list").text(`Humidity: ${weather.main.humidity} %`);
         var temp = $("<p>").addClass("list").text(`Temperature: ${weather.main.temp} °F`);
-
+        // Append data
         $("#weather-info").append(windSpeed, humidity, temp);
         $("#weather-icons").append(img);
-
+        // call other functions
         indexUV(weather.coord.lat, weather.coord.lon);
         forecast(search);
       },
-      error: function (err) {
-        alert(err.responseJSON.message);
-      }
+      error: function (err) { alert(err.responseJSON.message); }
     })
   }
 
