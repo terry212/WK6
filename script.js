@@ -1,5 +1,4 @@
 $(document).ready(function () {
-
   var key = "3e86ecd706ea3fa8f9a5cdead4a1ffb2";
 
   $("#search-btn").on("click", function () {
@@ -25,12 +24,12 @@ $(document).ready(function () {
       url: `http://api.openweathermap.org/data/2.5/weather?q=${search}&appid=${key}&units=imperial`,
       dataType: "JSON",
       success: function (weather) {
-
         makeHistory(search);
         // clear old data
         $("#city-header").empty();
         $("#weather-icons").empty();
         $("#weather-info").empty();
+        $("#forecast-cards").empty();
         // Add new search data
         $("#city-header").text(`${weather.name} ( ${new Date().toLocaleDateString()} )`);
         var img = $("<img>").attr("src", `http://openweathermap.org/img/w/${weather.weather[0].icon}.png`);
@@ -75,13 +74,13 @@ $(document).ready(function () {
           // grab data of only the list that has 12 PM in the dt_txt field
           if (forecastData.list[i].dt_txt.indexOf("12:00:00") !== -1) {
             // create and append a card with forecast info
-            var cardTitle = $("<h5>").addClass("card-title").text(new Date(forecastData.list[i].dt_txt).toLocaleDateString());
-            var img = $("<img>").attr("src", `http://openweathermap.org/img/w/${forecastData.list[i].icon}.png`);
-            var windSpeed = $("<p>").addClass("card-text").text(`Wind Speed: ${forecastData.list[i].wind.speed} MPH`);
+            var cardTitle = $("<h5>").addClass("card-title d-inline-block").text(new Date(forecastData.list[i].dt_txt).toLocaleDateString() );
+            var img = $("<img>").attr("src", `http://openweathermap.org/img/w/${forecastData.list[i].weather[0].icon}.png`);
+            var windSpeed = $("<p>").addClass("card-text").text(`Wind: ${forecastData.list[i].wind.speed} MPH`);
             var humidity = $("<p>").addClass("card-text").text(`Humidity: ${forecastData.list[i].main.humidity} %`);
             var temp = $("<p>").addClass("card-text").text(`Temperature: ${forecastData.list[i].main.temp} °F`);
-            var divTag = $("<div>").addClass("card col-md-12");
-            var divBody = $("<div>").addClass("card-body col-md-12").append(cardTitle, windSpeed, humidity, temp);
+            var divTag = $("<div>").addClass("card col-md-9").attr({"style": "margin-right: 5px; margin-left: 5px;"});
+            var divBody = $("<div>").addClass("card-body col-md-12").attr({"style": "padding: .25rem !important;"}).append(cardTitle.append(img), windSpeed, humidity, temp);
             $("#forecast-cards").append(divTag.append(divBody));
           }
         }
