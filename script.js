@@ -42,6 +42,7 @@ $(document).ready(function () {
         $("#weather-icons").append(img);
 
         indexUV(weather.coord.lat, weather.coord.lon);
+        forecast(search);
       }
     })
   }
@@ -60,6 +61,30 @@ $(document).ready(function () {
         else { btn.addClass("btn-danger"); }
         // append UV data
         $("#weather-info").append(pTag.append(btn));
+      }
+    });
+  }
+
+  function forecast(search) {
+    $.ajax({
+      type: "GET",
+      url: `http://api.openweathermap.org/data/2.5/forecast?q=${search}&appid=${key}&units=imperial`,
+      dataType: "JSON",
+      success: function (forecastData) {
+        for (let i = 0; i < forecastData.list.length; i++) {
+          // grab data of only the list that has 12 PM in the dt_txt field
+          if (forecastData.list[i].dt_txt.indexOf("12:00:00") !== -1) {
+            // create and append a card with forecast info
+            var cardTitle = $("<h5>").addClass("card-title").text(new Date(forecastData.list[i].dt_txt).toLocaleDateString());
+            var img = $("<img>").attr("src", `http://openweathermap.org/img/w/${forecastData.list[i].icon}.png`);
+            var windSpeed = $("<p>").addClass("card-text").text(`Wind Speed: ${forecastData.list[i].wind.speed} MPH`);
+            var humidity = $("<p>").addClass("card-text").text(`Humidity: ${forecastData.list[i].main.humidity} %`);
+            var temp = $("<p>").addClass("card-text").text(`Temperature: ${forecastData.list[i].main.temp} °F`);
+            var divTag = $("<div>").addClass("card col-md-12");
+            var divBody = $("<div>").addClass("card-body col-md-12").append(cardTitle, windSpeed, humidity, temp);
+            $("#forecast-cards").append(divTag.append(divBody));
+          }
+        }
       }
     });
   }
