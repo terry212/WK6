@@ -1,5 +1,14 @@
 $(document).ready(function () {
   var key = "3e86ecd706ea3fa8f9a5cdead4a1ffb2";
+  var history = JSON.parse(window.localStorage.getItem("history")) || [];
+  // Show weather of last item in storage
+  if (history.length > 0) {
+    findWeather(history[history.length-1]);
+  }
+  // append items in the history bar
+  for (var i = 0; i < history.length; i++) {
+    makeHistory(history[i]);
+  }
 
   $("#search-btn").on("click", function () {
     var search = $("#search-query").val();
@@ -10,11 +19,11 @@ $(document).ready(function () {
   });
 
   $("#list-tab").on("click", "a", function () {
-    findWeather($(this).text())
+    findWeather($(this).text());
   });
 
   function makeHistory(search) {
-    var aTag = $("<a>").addClass("list-group-item list-group-item-action").attr({ "id": search, "role": "list", "aria-controls": search, "data-toggle": "list" }).text(search);
+    var aTag = $("<a>").addClass("list-group-item list-group-item-action").attr({ "id": search, "role": "list", "aria-controls": search, "data-toggle": "list", "style": "text-transform: capitalize;" }).text(search);
     $("#list-tab").append(aTag);
   }
 
@@ -24,7 +33,12 @@ $(document).ready(function () {
       url: `http://api.openweathermap.org/data/2.5/weather?q=${search}&appid=${key}&units=imperial`,
       dataType: "JSON",
       success: function (weather) {
-        makeHistory(search);
+        // condition where the search item does not exist in the array, make the history list and store in local storage
+        if (history.indexOf(search) === -1) {
+          history.push(search);
+          window.localStorage.setItem("history", JSON.stringify(history));
+          makeHistory(search);
+        }
         // clear old data
         $("#city-header").empty();
         $("#weather-icons").empty();
@@ -74,13 +88,13 @@ $(document).ready(function () {
           // grab data of only the list that has 12 PM in the dt_txt field
           if (forecastData.list[i].dt_txt.indexOf("12:00:00") !== -1) {
             // create and append a card with forecast info
-            var cardTitle = $("<h5>").addClass("card-title d-inline-block").text(new Date(forecastData.list[i].dt_txt).toLocaleDateString() );
+            var cardTitle = $("<h5>").addClass("card-title d-inline-block").text(new Date(forecastData.list[i].dt_txt).toLocaleDateString());
             var img = $("<img>").attr("src", `http://openweathermap.org/img/w/${forecastData.list[i].weather[0].icon}.png`);
             var windSpeed = $("<p>").addClass("card-text").text(`Wind: ${forecastData.list[i].wind.speed} MPH`);
             var humidity = $("<p>").addClass("card-text").text(`Humidity: ${forecastData.list[i].main.humidity} %`);
             var temp = $("<p>").addClass("card-text").text(`Temperature: ${forecastData.list[i].main.temp} °F`);
-            var divTag = $("<div>").addClass("card col-md-9").attr({"style": "margin-right: 5px; margin-left: 5px;"});
-            var divBody = $("<div>").addClass("card-body col-md-12").attr({"style": "padding: .25rem !important;"}).append(cardTitle.append(img), windSpeed, humidity, temp);
+            var divTag = $("<div>").addClass("card col-md-9").attr({ "style": "margin-right: 5px; margin-left: 5px;" });
+            var divBody = $("<div>").addClass("card-body col-md-12").attr({ "style": "padding: .25rem !important;" }).append(cardTitle.append(img), windSpeed, humidity, temp);
             $("#forecast-cards").append(divTag.append(divBody));
           }
         }
