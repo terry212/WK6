@@ -56,6 +56,9 @@ $(document).ready(function () {
 
         indexUV(weather.coord.lat, weather.coord.lon);
         forecast(search);
+      },
+      error: function (err) {
+        alert(err.responseJSON.message);
       }
     })
   }
